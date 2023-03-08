@@ -2,6 +2,7 @@ package assertj;
 
 import org.assertj.core.data.Index;
 import org.junit.jupiter.api.Test;
+import ru.job4j.assertj.SimpleConvert;
 
 import java.util.List;
 import java.util.Map;

@@ -6,7 +6,7 @@ public class UserStore implements Store<User> {
 
     @Override
     public void add(User model) {
-store.add(model);
+        store.add(model);
     }
 
     @Override

@@ -28,6 +28,20 @@ public class ForwardLinked<E> implements Iterable<E> {
         }
     }
 
+    public void addFirst(E value) {
+        Node<E> newNode = new Node<>(value, null);
+        if (head == null) {
+            head = newNode;
+            size++;
+            modCount++;
+        } else {
+            newNode.next = head;
+            head = newNode;
+            size++;
+            modCount++;
+        }
+    }
+
     public E get(int index) {
         Objects.checkIndex(index, size);
         Node<E> node = head;

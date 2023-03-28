@@ -4,7 +4,7 @@ import java.io.*;
 import java.util.List;
 
 public class Analysis {
-    public void unavailable(String source, String target) {
+    public static void unavailable(String source, String target) {
         try (BufferedReader in = new BufferedReader(new FileReader(source));
              PrintWriter out = new PrintWriter(new BufferedOutputStream(new FileOutputStream(target)))) {
             List<String[]> list = in.lines()
@@ -28,7 +28,6 @@ public class Analysis {
     }
 
     public static void main(String[] args) {
-        Analysis analysis = new Analysis();
-        analysis.unavailable("data/server.log", "data/target.csv");
+        Analysis.unavailable("data/server.log", "data/target.csv");
     }
 }

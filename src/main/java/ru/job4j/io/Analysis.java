@@ -1,28 +1,26 @@
 package ru.job4j.io;
 
 import java.io.*;
-import java.util.Objects;
+import java.util.List;
 
 public class Analysis {
     public void unavailable(String source, String target) {
-        StringBuilder builder = new StringBuilder();
         try (BufferedReader in = new BufferedReader(new FileReader(source));
              PrintWriter out = new PrintWriter(new BufferedOutputStream(new FileOutputStream(target)))) {
-            in.lines()
-                    .forEach(s -> {
-                        boolean isWork = true;
-                        String[] split = s.split(" ", 2);
-                        if (!isWork) {
-                            builder.append(split[1] + ";");
-                        }
-                        if (split[0].equals("500") || split[0].equals("400")) {
-                            isWork = false;
-                        } else  if (split[0].equals("200") || split[0].equals("300")) {
-                            isWork = true;
-                        }
-
-                    });
-            out.println(builder);
+            List<String[]> list = in.lines()
+                    .map(s -> s.split(" "))
+                    .toList();
+            boolean isWork = true;
+            for (String[] s : list) {
+                if (isWork && (s[0].equals("400") || s[0].equals("500"))) {
+                    isWork = false;
+                    out.printf("%s;", s[1]);
+                }
+                if (!isWork && (s[0].equals("200") || s[0].equals("300"))) {
+                    isWork = true;
+                    out.printf("%S;%n", s[1]);
+                }
+            }
 
         } catch (Exception e) {
             e.printStackTrace();

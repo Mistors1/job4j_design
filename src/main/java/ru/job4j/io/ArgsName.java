@@ -26,7 +26,7 @@ public class ArgsName {
 
     }
 
-    public static ArgsName of(String[] args) {
+    public  ArgsName of(String[] args) {
         if (args.length == 0) {
             throw new IllegalArgumentException("Arguments not passed to program");
         }
@@ -37,14 +37,15 @@ public class ArgsName {
     }
 
     public static void main(String[] args) {
-        ArgsName jvm = ArgsName.of(new String[]{"-Xmx=512", "-encoding=UTF-8"});
+        ArgsName argsName = new ArgsName();
+        ArgsName jvm = argsName.of(new String[]{"-Xmx=512", "-encoding=UTF-8"});
         System.out.println(jvm.get("Xmx"));
 
-        ArgsName zip = ArgsName.of(new String[]{"-out=project.zip", "-encoding=UTF-8"});
+        ArgsName zip = argsName.of(new String[]{"-out=project.zip", "-encoding=UTF-8"});
         System.out.println(zip.get("out"));
     }
 
-    private void validate(String[] args) {
+    public void validate(String[] args) {
         Arrays.stream(args)
                 .forEach(s -> {
                     if (!s.startsWith("-")) {

@@ -13,10 +13,10 @@ public class Search {
         search.validate(args);
         Path start = Paths.get(args[0]);
         String word = args[1];
-        search(start, p -> p.toFile().getName().endsWith(word)).forEach(System.out::println);
+        search.search(start, p -> p.toFile().getName().endsWith(word)).forEach(System.out::println);
     }
 
-    public static List<Path> search(Path root, Predicate<Path> condition) throws IOException {
+    public List<Path> search(Path root, Predicate<Path> condition) throws IOException {
         SearchFiles searcher = new SearchFiles(condition);
         Files.walkFileTree(root, searcher);
         return searcher.getPath();

@@ -16,6 +16,7 @@ public class Zip {
                 try (BufferedInputStream out = new BufferedInputStream(new FileInputStream(file.toString()))) {
                     zip.write(out.readAllBytes());
                 }
+                zip.closeEntry();
             }
         } catch (Exception e) {
             e.printStackTrace();
@@ -45,7 +46,7 @@ public class Zip {
         Zip zip = new Zip();
         Search search = new Search();
         zip.validate(args);
-        List<Path> searchList = search.search(Path.of("C:\\projects\\job4j_design\\"),
+        List<Path> searchList = search.search(Path.of(argsName.get("d")),
                 p -> p.toFile().getName().endsWith(argsName.get("e")));
         zip.packFiles(searchList, Path.of(argsName.get("o")));
     }

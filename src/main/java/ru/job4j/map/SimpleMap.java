@@ -3,13 +3,14 @@ package ru.job4j.map;
 import java.util.ConcurrentModificationException;
 import java.util.Iterator;
 import java.util.NoSuchElementException;
+import java.util.Objects;
 
 public class SimpleMap<K, V> implements Map<K, V> {
 
     private static final float LOAD_FACTOR = 0.75f;
 
-    private final int capacity = 8;
-    private int size = 0;
+    private int capacity = 8;
+    private int amount = 0;
 
     private int modCount = 0;
 
@@ -17,48 +18,67 @@ public class SimpleMap<K, V> implements Map<K, V> {
 
     @Override
     public boolean put(K key, V value) {
-        if (size / capacity >= LOAD_FACTOR) {
+        int index = indexFor(hash(key), capacity);
+        if (amount >= capacity * LOAD_FACTOR) {
             expand();
         }
-        for (MapEntry<K, V> obj : table) {
-            if (obj.key.hashCode() != key.hashCode()) {
-                table[indexFor(key.hashCode())] = obj;
-                size++;
-                modCount++;
-                return true;
-            } else if (obj.key.hashCode() == key.hashCode()) {
-                if (obj.key.equals(key)) {
-                    table[indexFor(key.hashCode())].value = value;
-                    return true;
-                } else {
-                    table[indexFor(key.hashCode())] = obj;
-                    size++;
-                    modCount++;
-                    return true;
+        if (key == null) {
+            table[0] = new MapEntry<>(null, value);
+            amount++;
+            modCount++;
+            return true;
+        }
+        if (key.equals(capacity)) {
+            return false;
+        } else if (table[index] == null) {
+            table[index] = new MapEntry<>(key, value);
+            amount++;
+            modCount++;
+            return true;
+        } else {
+            if (Objects.equals(table[index].key, key)) {
+                return false;
+            } else {
+                for (int i = 0; i < capacity; i++) {
+                    if (table[i] == null) {
+                        table[i] = new MapEntry<>(key, value);
+                        amount++;
+                        modCount++;
+                        return true;
+                    }
                 }
             }
         }
         return false;
     }
 
-    private int hash(int hashCode) {
-        return hashCode ^ (hashCode >>> 16);
+
+    private int hash(K key) {
+        return key == null ? 0 : key.hashCode() ^ (key.hashCode() >>> capacity);
     }
 
-    private int indexFor(int hash) {
-        if (table[hash % capacity] == null) {
-            return hash % capacity;
-        } else {
-            return (hash % capacity) + 1;
-        }
+    private int indexFor(int hash, int capacity) {
+        return hash & (capacity - 1);
+    }
+
+    public int size() {
+        return amount;
     }
 
     private void expand() {
-        MapEntry<K, V>[] map = new MapEntry[capacity * 2];
-        for (MapEntry<K, V> f : table) {
-            put(f.key, f.value);
+        int newCapacity = capacity * 2;
+        MapEntry<K, V>[] newTable = new MapEntry[newCapacity];
+        for (MapEntry<K, V> entry : table) {
+            if (entry != null) {
+                int index = indexFor(hash(entry.key), newCapacity);
+                while (newTable[index] != null) {
+                    index = (index + 1) % newCapacity;
+                }
+                newTable[index] = entry;
+            }
         }
-        table = map;
+        table = newTable;
+        capacity = newCapacity;
     }
 
     @Override
@@ -76,13 +96,15 @@ public class SimpleMap<K, V> implements Map<K, V> {
     public Iterator<K> iterator() {
         return new Iterator<>() {
             private final int expectedModCount = modCount;
-
             private int valueIt = 0;
 
             @Override
             public boolean hasNext() {
                 if (expectedModCount != modCount) {
                     throw new ConcurrentModificationException();
+                }
+                while (valueIt < capacity && table[valueIt] == null) {
+                    valueIt++;
                 }
                 return valueIt < capacity;
             }
@@ -91,9 +113,6 @@ public class SimpleMap<K, V> implements Map<K, V> {
             public K next() {
                 if (!hasNext()) {
                     throw new NoSuchElementException();
-                }
-                if (table[valueIt++] == null) {
-                    return null;
                 }
                 return table[valueIt++].key;
             }

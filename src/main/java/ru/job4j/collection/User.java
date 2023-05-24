@@ -10,6 +10,7 @@ public class User {
     private final int children;
     private final Calendar birthday;
 
+    private static int capacity = 8;
     public User(String name, int children, Calendar birthday) {
         this.name = name;
         this.children = children;
@@ -20,22 +21,22 @@ public class User {
         Calendar birthday = Calendar.getInstance();
         User user1 = new User("name", 1, birthday);
         User user2 = new User("name", 1, birthday);
-        Map<User, Object> map = new HashMap<>();
+        Map<User, Object> map = new HashMap<>(capacity);
         map.put(user1, new Object());
         map.put(user2, new Object());
         int hashCode1 = user1.hashCode();
-        int hash1 = hashCode1 ^ (hashCode1 >>> 16);
-        int bucket1 = hash1 & 15;
+        int hash1 = hashCode1 ^ (hashCode1 >>> capacity);
+        int bucket1 = hash1 & capacity - 1;
         int hashCode2 = user2.hashCode();
-        int hash2 = hashCode2 ^ (hashCode1 >>> 16);
-        int bucket2 = hash2 & 15;
+        int hash2 = hashCode2 ^ (hashCode2 >>> capacity);
+        int bucket2 = hash2 & capacity - 1;
         System.out.printf("user1 - hashCode: %s, hash: %s, bucket: %s  ", hashCode1, hash1, bucket1);
         System.out.printf("user2 - hashCode: %s, hash: %s, bucket: %s  ", hashCode2, hash2, bucket2);
         System.out.println(map.size());
     }
 
-    @Override
-    public boolean equals(Object o) {
+  /*   @Override
+   public boolean equals(Object o) {
         if
         (this == o) {
             return true;
@@ -46,7 +47,7 @@ public class User {
         }
         User user = (User) o;
         return children == user.children && Objects.equals(name, user.name) && Objects.equals(birthday, user.birthday);
-    }
+    }*/
 
    @Override
     public int hashCode() {
